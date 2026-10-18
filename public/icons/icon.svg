@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#D97706" />
+      <stop offset="100%" stop-color="#92400E" />
+    </linearGradient>
+    <linearGradient id="barGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="112" fill="url(#goldGrad)" />
+  
+  <!-- Subtle Inner Glow / Border -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="#FDE68A" stroke-width="4" stroke-opacity="0.3" />
+
+  <!-- Gold Bar Stack Illustration -->
+  <!-- Top Bar -->
+  <polygon points="176,170 336,170 380,230 132,230" fill="url(#barGrad)" />
+  <polygon points="132,230 380,230 380,260 132,260" fill="#B45309" />
+  
+  <!-- Bottom Left Bar -->
+  <polygon points="90,280 230,280 260,340 60,340" fill="url(#barGrad)" />
+  <polygon points="60,340 260,340 260,370 60,370" fill="#92400E" />
+
+  <!-- Bottom Right Bar -->
+  <polygon points="280,280 420,280 450,340 250,340" fill="url(#barGrad)" />
+  <polygon points="250,340 450,340 450,370 250,370" fill="#92400E" />
+
+  <!-- Sparkle top right -->
+  <path d="M 390 130 Q 390 160 420 160 Q 390 160 390 190 Q 390 160 360 160 Q 390 160 390 130 Z" fill="#FFFBEB" />
+</svg>
