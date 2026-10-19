@@ -1,0 +1,27 @@
+{
+  "brand": "emasKu",
+  "tagline": "Portofolio Emas Fisik",
+  "brief": "Aplikasi PWA pelacak portofolio emas batangan dan perhiasan Indonesia. Pantau harga Antam, Galeri 24, Pegadaian, hitung keuntungan portofolio, dan periksa harga buyback real-time.",
+  "adjectives": ["terpercaya", "elegan", "finansial", "presisi"],
+  "industry": "finance",
+  "brand_color": "#F59E0B",
+  "tile_color": "#18181B",
+  "greyscale": false,
+  "final": true,
+  "concepts": [
+    {
+      "name": "CertiVault",
+      "symbol": "emasku-symbol.svg",
+      "lockup": "emasku-lockup-dark.svg",
+      "stacked": "emasku-stacked.svg",
+      "avatar": "emasku-avatar.svg",
+      "idea": "Kartu blister CertiCard pelindung batangan emas murni 3D dengan cap kemurnian bintang 999.9.",
+      "rationale": [
+        "Identitas visual otentik yang mencerminkan standar kepemilikan emas fisik di Indonesia (CertiCard Antam / UBS).",
+        "Palet warna emas murni dan charcoal slate menghasilkan tampilan finansial premium yang solid.",
+        "Teruji tajam di seluruh varian: favicon 16px, avatar sosial, hingga instalasi PWA standalone."
+      ]
+    }
+  ],
+  "recommendation": "CertiVault adalah identitas visual ideal yang memadukan keamanan aset, transparansi finansial, dan kemewahan emas murni."
+}

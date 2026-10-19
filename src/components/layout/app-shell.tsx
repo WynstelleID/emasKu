@@ -14,8 +14,8 @@ import {
   Sun,
   Moon,
   Bell,
-  Sparkles,
 } from 'lucide-react';
+import { Logo } from '@/components/ui/logo';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/providers/theme-provider';
@@ -59,9 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <aside className="hidden md:flex flex-col w-64 border-r border-border bg-card/60 backdrop-blur-md shrink-0 sticky top-0 h-screen z-30">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20">
-              <Sparkles className="w-5 h-5" />
-            </div>
+            <Logo className="w-9 h-9 shrink-0 drop-shadow-md" size={36} />
             <div>
               <span className="font-bold text-lg tracking-tight text-foreground flex items-center gap-1.5">
                 emasKu
@@ -153,9 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-background/80 backdrop-blur-md px-4 sm:px-6">
           <div className="flex items-center gap-2 md:hidden">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-sm">
-                <Sparkles className="w-4 h-4" />
-              </div>
+              <Logo className="w-8 h-8 shrink-0 drop-shadow-sm" size={32} />
               <span className="font-bold text-base tracking-tight text-foreground">
                 emasKu
               </span>

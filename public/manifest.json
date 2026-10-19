@@ -4,8 +4,8 @@
   "description": "Pantau koleksi emas batangan & perhiasan, bandingkan harga jual dan buyback real-time",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#cb8816",
+  "background_color": "#18181b",
+  "theme_color": "#f59e0b",
   "orientation": "portrait",
   "lang": "id-ID",
   "icons": [
@@ -13,13 +13,19 @@
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

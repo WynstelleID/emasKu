@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title-b">
+  <title id="title-b">emasKu Concept B - HexaVault</title>
+  <!-- Top Face: Gold Bullion Ingot -->
+  <polygon fill="#000000" points="128,34 206,79 135,120 57,75" />
+  
+  <!-- Bottom-Left Face: Secure Vault Ingot -->
+  <polygon fill="#000000" points="49,89 121,130 121,212 49,171" />
+
+  <!-- Bottom-Right Face: Liquid Asset Ingot -->
+  <polygon fill="#000000" points="135,130 207,89 207,171 135,212" />
+</svg>

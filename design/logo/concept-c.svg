@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title-c">
+  <title id="title-c">emasKu Concept C - Ascending Tier</title>
+  <!-- Top Tier: 1g Starter Ingot -->
+  <path fill="#000000" d="M 94 44 L 162 44 L 178 82 L 78 82 Z" />
+  
+  <!-- Middle Tier: 5g Investment Ingot -->
+  <path fill="#000000" d="M 68 98 L 188 98 L 206 140 L 50 140 Z" />
+
+  <!-- Base Tier: 10g Foundation Ingot -->
+  <path fill="#000000" d="M 40 156 L 216 156 L 236 202 L 20 202 Z" />
+</svg>
