@@ -26,6 +26,16 @@ import {
 } from '@/lib/utils';
 import { getProviderInfo } from '@/lib/pricing/providers';
 
+// Compact weight for the holding badge: "10", "0,5", "2,5" (unit is shown below it)
+const weightBadgeFormatter = new Intl.NumberFormat('id-ID', {
+  maximumFractionDigits: 2,
+});
+
+// Headline number of a summary card. Steps down in size where the cards are
+// narrow (4 columns at xl) and wraps instead of spilling out of the card.
+const SUMMARY_VALUE_CLASS =
+  'min-w-0 break-words text-2xl sm:text-3xl xl:text-2xl 2xl:text-3xl font-extrabold tracking-tight tabular-nums mt-1';
+
 export function DashboardView() {
   const {
     holdings,
@@ -94,15 +104,15 @@ export function DashboardView() {
       </div>
 
       {/* Main Portfolio Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* Estimasi Nilai Pasar */}
-        <Card className="relative overflow-hidden border-amber-200/60 dark:border-amber-900/40 bg-gradient-to-br from-card via-card to-amber-500/5">
+        <Card className="relative min-w-0 overflow-hidden border-amber-200/60 dark:border-amber-900/40 bg-gradient-to-br from-card via-card to-amber-500/5">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
-              <span>Estimasi Nilai Pasar</span>
-              <Coins className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs font-medium">
+              <span className="truncate">Estimasi Nilai Pasar</span>
+              <Coins className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums text-foreground mt-1">
+            <div className={`${SUMMARY_VALUE_CLASS} text-foreground`}>
               {isLoading ? (
                 <div className="h-8 w-36 bg-muted animate-pulse rounded" />
               ) : (
@@ -111,7 +121,7 @@ export function DashboardView() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xs text-muted-foreground flex items-center justify-between">
+            <div className="text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
               <span>Nilai Buyback (Resale):</span>
               <span className="font-semibold tabular-nums text-foreground">
                 {formatIDR(summary.estimatedResaleValue)}
@@ -121,18 +131,18 @@ export function DashboardView() {
         </Card>
 
         {/* Keuntungan / Kerugian (PnL) */}
-        <Card>
+        <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
-              <span>Untung / Rugi (Unrealized)</span>
+            <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs font-medium">
+              <span className="truncate">Untung / Rugi (Unrealized)</span>
               {isProfit ? (
-                <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <TrendingUp className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <TrendingDown className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <TrendingDown className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
               )}
             </div>
             <div
-              className={`text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums mt-1 ${
+              className={`${SUMMARY_VALUE_CLASS} ${
                 summary.totalAcquisitionCost === 0
                   ? 'text-muted-foreground'
                   : isProfit
@@ -150,7 +160,7 @@ export function DashboardView() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xs text-muted-foreground flex items-center justify-between">
+            <div className="text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
               <span>Imbal Hasil:</span>
               <span
                 className={`font-semibold tabular-nums ${
@@ -168,13 +178,13 @@ export function DashboardView() {
         </Card>
 
         {/* Total Bobot Emas */}
-        <Card>
+        <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
-              <span>Total Bobot Emas</span>
-              <Scale className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs font-medium">
+              <span className="truncate">Total Bobot Emas</span>
+              <Scale className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums text-foreground mt-1">
+            <div className={`${SUMMARY_VALUE_CLASS} text-foreground`}>
               {isLoading ? (
                 <div className="h-8 w-24 bg-muted animate-pulse rounded" />
               ) : (
@@ -183,7 +193,7 @@ export function DashboardView() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xs text-muted-foreground flex items-center justify-between">
+            <div className="text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
               <span>Jumlah Keping / Koleksi:</span>
               <span className="font-semibold tabular-nums text-foreground">
                 {summary.holdingsCount} unit
@@ -193,13 +203,13 @@ export function DashboardView() {
         </Card>
 
         {/* Modal / Biaya Akuisisi */}
-        <Card>
+        <Card className="min-w-0 overflow-hidden">
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
-              <span>Total Modal Beli</span>
-              <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <div className="flex items-center justify-between gap-2 text-muted-foreground text-xs font-medium">
+              <span className="truncate">Total Modal Beli</span>
+              <ShieldCheck className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums text-foreground mt-1">
+            <div className={`${SUMMARY_VALUE_CLASS} text-foreground`}>
               {isLoading ? (
                 <div className="h-8 w-32 bg-muted animate-pulse rounded" />
               ) : (
@@ -208,7 +218,7 @@ export function DashboardView() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xs text-muted-foreground flex items-center justify-between">
+            <div className="text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
               <span>Rata-rata / gram:</span>
               <span className="font-semibold tabular-nums text-foreground">
                 {summary.totalGrams > 0 && summary.totalAcquisitionCost > 0
@@ -222,10 +232,10 @@ export function DashboardView() {
 
       {/* Quick Price Monitor Banner */}
       <Card className="bg-card border-border">
-        <CardHeader className="pb-3 flex flex-row items-center justify-between">
-          <div>
+        <CardHeader className="pb-3 flex flex-row flex-wrap items-start justify-between gap-x-4 gap-y-2 space-y-0">
+          <div className="min-w-0 space-y-1.5">
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <TrendingUp className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
               Harga Emas Pasar Hari Ini (1 Gram)
             </CardTitle>
             <CardDescription className="text-xs">
@@ -234,27 +244,36 @@ export function DashboardView() {
           </div>
           <Link
             href="/gold-prices"
-            className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+            className="shrink-0 whitespace-nowrap text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
           >
             Lihat Semua <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {quickPrices.map((p) => (
               <div
                 key={p.id}
-                className="p-3 rounded-lg border border-border/80 bg-background/50 hover:bg-background transition-colors"
+                className="min-w-0 flex flex-col rounded-xl border border-border/80 bg-background/50 p-3.5 transition-colors hover:border-amber-500/40 hover:bg-background"
               >
-                <div className="text-xs font-medium text-muted-foreground">{p.label}</div>
-                <div className="text-base sm:text-lg font-bold tabular-nums text-foreground mt-0.5">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden />
+                  <span className="truncate">{p.label}</span>
+                </div>
+                <div
+                  className={`mt-1.5 break-words text-base sm:text-lg font-bold leading-tight tabular-nums ${
+                    p.price ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
+                >
                   {p.price ? formatIDR(p.price) : 'Rp -'}
                 </div>
-                <div className="text-[11px] text-muted-foreground mt-1 flex items-center justify-between">
-                  <span>Buyback:</span>
-                  <span className="font-medium text-foreground">
-                    {p.buyback ? formatIDR(p.buyback) : '-'}
-                  </span>
+                <div className="mt-auto pt-2.5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 border-t border-border/70 pt-2 text-[11px]">
+                    <span className="text-muted-foreground">Buyback</span>
+                    <span className="font-semibold tabular-nums text-foreground">
+                      {p.buyback ? formatIDR(p.buyback) : '-'}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -317,8 +336,16 @@ export function DashboardView() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-xs shrink-0">
-                          {formatGrams(holding.weightGrams)}
+                        <div
+                          className="h-11 min-w-11 px-2 rounded-lg bg-amber-500/10 flex flex-col items-center justify-center text-amber-700 dark:text-amber-300 shrink-0"
+                          title={formatGrams(holding.weightGrams)}
+                        >
+                          <span className="font-bold text-sm leading-none tabular-nums">
+                            {weightBadgeFormatter.format(holding.weightGrams)}
+                          </span>
+                          <span className="text-[10px] font-medium leading-none mt-1 opacity-80">
+                            gram
+                          </span>
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-semibold text-sm text-foreground truncate">

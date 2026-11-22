@@ -19,6 +19,10 @@ import { Select } from '@/components/ui/select';
 import { formatIDR, formatGrams, formatDate } from '@/lib/utils';
 import { getProviderInfo } from '@/lib/pricing/providers';
 
+// Label and amount row inside a price card. The amount drops to its own
+// line, right aligned, when both do not fit side by side.
+const PRICE_ROW_CLASS = 'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5';
+
 export function PriceBoard() {
   const { data: prices = [], isFetching, refetch } = useAllGoldPrices();
   const { data: providers = [] } = useGoldProviders();
@@ -63,9 +67,9 @@ export function PriceBoard() {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-amber-500" />
+            <TrendingUp className="w-6 h-6 shrink-0 text-amber-500" />
             Harga Emas Terkini
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -73,9 +77,9 @@ export function PriceBoard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           <Link href="/gold-prices/history">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+            <Button variant="outline" size="sm" className="gap-1.5 whitespace-nowrap text-xs">
               <BarChart2 className="w-4 h-4 text-amber-500" /> Grafik Riwayat
             </Button>
           </Link>
@@ -97,7 +101,7 @@ export function PriceBoard() {
       <Card>
         <CardContent className="p-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant={viewMode === 'cards' ? 'default' : 'ghost'}
                 size="sm"
@@ -116,16 +120,16 @@ export function PriceBoard() {
               </Button>
             </div>
 
-            <div className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" />
+            <div className="text-xs text-muted-foreground flex items-center gap-1.5 whitespace-nowrap">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
               Total data: <span className="font-semibold text-foreground">{prices.length}</span> keping
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Search */}
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+            <div className="relative min-w-0">
+              <Search className="pointer-events-none w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Cari jenis emas..."
                 value={search}
@@ -170,7 +174,7 @@ export function PriceBoard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <Scale className="w-4 h-4 text-amber-500" />
+              <Scale className="w-4 h-4 shrink-0 text-amber-500" />
               Matriks Perbandingan Harga Jual & Buyback
             </CardTitle>
             <CardDescription className="text-xs">
@@ -178,14 +182,16 @@ export function PriceBoard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <table className="w-full text-xs text-left border-collapse">
+            <table className="w-full min-w-[640px] text-xs text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-muted/40">
-                  <th className="py-2.5 px-3 font-semibold">Denominasi</th>
+                  <th className="sticky left-0 z-10 bg-muted py-2.5 px-3 font-semibold whitespace-nowrap">
+                    Denominasi
+                  </th>
                   {compareSources.map((s) => {
                     const info = getProviderInfo(s);
                     return (
-                      <th key={s} className="py-2.5 px-3 font-semibold text-center">
+                      <th key={s} className="py-2.5 px-3 font-semibold text-center whitespace-nowrap">
                         {info.shortName}
                       </th>
                     );
@@ -195,7 +201,7 @@ export function PriceBoard() {
               <tbody className="divide-y divide-border">
                 {compareWeights.map((w) => (
                   <tr key={w} className="hover:bg-accent/40 transition-colors">
-                    <td className="py-3 px-3 font-bold tabular-nums text-foreground">
+                    <td className="sticky left-0 z-10 bg-card py-3 px-3 font-bold tabular-nums text-foreground whitespace-nowrap">
                       {formatGrams(w)}
                     </td>
                     {compareSources.map((s) => {
@@ -208,7 +214,7 @@ export function PriceBoard() {
                           : null;
 
                       return (
-                        <td key={s} className="py-3 px-3 text-center tabular-nums">
+                        <td key={s} className="py-3 px-3 text-center tabular-nums whitespace-nowrap align-top">
                           {item ? (
                             <div className="space-y-0.5">
                               <div className="font-bold text-foreground">
@@ -235,9 +241,29 @@ export function PriceBoard() {
             </table>
           </CardContent>
         </Card>
+      ) : filteredPrices.length === 0 ? (
+        <Card className="p-8 text-center border-dashed">
+          <div className="max-w-sm mx-auto space-y-2">
+            <Search className="w-9 h-9 text-muted-foreground mx-auto" />
+            <h3 className="text-base font-semibold text-foreground">
+              {isFetching
+                ? 'Memuat harga emas...'
+                : prices.length === 0
+                ? 'Belum ada data harga'
+                : 'Tidak ada harga yang cocok dengan filter'}
+            </h3>
+            {!isFetching && (
+              <p className="text-xs text-muted-foreground">
+                {prices.length === 0
+                  ? 'Klik Perbarui untuk mengambil harga terbaru.'
+                  : 'Coba ubah kata kunci pencarian atau filter di atas.'}
+              </p>
+            )}
+          </div>
+        </Card>
       ) : (
         /* Regular Card Grid View */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {filteredPrices.map((item) => {
             const info = getProviderInfo(item.source);
             const spread =
@@ -246,59 +272,62 @@ export function PriceBoard() {
             return (
               <Card
                 key={item.id}
-                className="hover:border-amber-500/50 hover:shadow-sm transition-all flex flex-col justify-between"
+                className="min-w-0 hover:border-amber-500/50 hover:shadow-sm transition-all flex flex-col"
               >
                 <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 truncate text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                       {info.shortName}
                     </span>
-                    <span className="text-xs font-bold text-foreground bg-accent px-2 py-0.5 rounded">
+                    <span className="shrink-0 whitespace-nowrap text-xs font-bold tabular-nums text-foreground bg-accent px-2 py-0.5 rounded">
                       {formatGrams(item.weight)}
                     </span>
                   </div>
-                  <CardTitle className="text-sm font-semibold truncate mt-2">
+                  <CardTitle
+                    className="text-sm font-semibold leading-snug line-clamp-2 break-words mt-2"
+                    title={item.materialType}
+                  >
                     {item.materialType}
                   </CardTitle>
                   <CardDescription className="text-[11px] flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> Tanggal: {formatDate(item.recordedDate)}
+                    <Clock className="w-3 h-3 shrink-0" /> Tanggal: {formatDate(item.recordedDate)}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-2 pt-0">
+                <CardContent className="flex flex-1 flex-col gap-2 pt-0">
                   <div className="p-3 rounded-lg bg-background border border-border/80 space-y-1.5 text-xs">
-                    <div className="flex justify-between items-center">
+                    <div className={PRICE_ROW_CLASS}>
                       <span className="text-muted-foreground">Harga Jual:</span>
-                      <span className="font-extrabold text-foreground tabular-nums text-sm">
+                      <span className="ml-auto font-extrabold text-foreground tabular-nums text-sm">
                         {item.sellPrice ? formatIDR(item.sellPrice) : '-'}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center">
+                    <div className={PRICE_ROW_CLASS}>
                       <span className="text-muted-foreground">Harga Buyback:</span>
-                      <span className="font-semibold text-foreground tabular-nums">
+                      <span className="ml-auto font-semibold text-foreground tabular-nums">
                         {item.buybackPrice ? formatIDR(item.buybackPrice) : 'Tidak ada data'}
                       </span>
                     </div>
 
                     {spread !== null && (
-                      <div className="flex justify-between items-center pt-1 border-t border-border/60 text-[11px]">
+                      <div className={`${PRICE_ROW_CLASS} pt-1.5 border-t border-border/60 text-[11px]`}>
                         <span className="text-muted-foreground">Selisih (Spread):</span>
-                        <span className="font-medium text-amber-600 dark:text-amber-400 tabular-nums">
+                        <span className="ml-auto font-medium text-amber-600 dark:text-amber-400 tabular-nums">
                           {formatIDR(spread)}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1">
-                    <span>Sumber: {info.name}</span>
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground pt-1">
+                    <span className="min-w-0 truncate">Sumber: {info.name}</span>
                     {info.website && info.website !== '#' && (
                       <a
                         href={info.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-foreground flex items-center gap-1"
+                        className="shrink-0 whitespace-nowrap hover:text-foreground flex items-center gap-1"
                       >
                         Web Resmi <ExternalLink className="w-2.5 h-2.5" />
                       </a>

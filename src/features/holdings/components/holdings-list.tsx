@@ -30,6 +30,11 @@ import {
 import { getProviderInfo } from '@/lib/pricing/providers';
 import type { GoldHolding } from '@/types/gold';
 
+// Label and amount row inside a holding card. The amount drops to its own
+// line, right aligned, when both do not fit side by side.
+const VALUE_ROW_CLASS =
+  'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-muted-foreground';
+
 export function HoldingsList() {
   const { holdings, summary } = usePortfolio();
   const { deleteHolding } = useHoldings();
@@ -88,9 +93,9 @@ export function HoldingsList() {
     <div className="space-y-6">
       {/* Header and Add Button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Coins className="w-6 h-6 text-amber-500" />
+            <Coins className="w-6 h-6 shrink-0 text-amber-500" />
             Koleksi Emas Fisik
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -98,8 +103,8 @@ export function HoldingsList() {
           </p>
         </div>
 
-        <Link href="/holdings/new">
-          <Button className="gap-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold">
+        <Link href="/holdings/new" className="shrink-0">
+          <Button className="w-full sm:w-auto gap-2 whitespace-nowrap bg-amber-600 hover:bg-amber-700 text-white font-semibold">
             <PlusCircle className="w-4 h-4" />
             Tambah Emas Baru
           </Button>
@@ -111,8 +116,8 @@ export function HoldingsList() {
         <CardContent className="p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Search Input */}
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+            <div className="relative min-w-0">
+              <Search className="pointer-events-none w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Cari nama emas, sertifikat..."
                 value={search}
@@ -122,7 +127,7 @@ export function HoldingsList() {
             </div>
 
             {/* Provider Filter */}
-            <div className="space-y-1">
+            <div className="min-w-0">
               <Select
                 value={providerFilter}
                 onChange={(e) => setProviderFilter(e.target.value)}
@@ -140,7 +145,7 @@ export function HoldingsList() {
             </div>
 
             {/* Category Filter */}
-            <div className="space-y-1">
+            <div className="min-w-0">
               <Select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
@@ -154,7 +159,7 @@ export function HoldingsList() {
             </div>
 
             {/* Sort Options */}
-            <div className="space-y-1">
+            <div className="min-w-0">
               <Select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'date' | 'weight' | 'value' | 'pnl')}
@@ -195,111 +200,132 @@ export function HoldingsList() {
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredHoldings.map((holding) => {
-            const info = getProviderInfo(holding.providerId);
-            const val = summary.valuations[holding.id];
-            const isProfit = (val?.unrealizedPnL ?? 0) >= 0;
-            const totalGrams = holding.weightGrams * holding.quantity;
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Menampilkan{' '}
+            <span className="font-semibold text-foreground tabular-nums">
+              {filteredHoldings.length}
+            </span>{' '}
+            dari {holdings.length} koleksi
+          </p>
 
-            return (
-              <Card
-                key={holding.id}
-                className="hover:border-amber-500/50 hover:shadow-md transition-all flex flex-col justify-between"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filteredHoldings.map((holding) => {
+              const info = getProviderInfo(holding.providerId);
+              const val = summary.valuations[holding.id];
+              const isProfit = (val?.unrealizedPnL ?? 0) >= 0;
+              const totalGrams = holding.weightGrams * holding.quantity;
+  
+              return (
+                <Card
+                  key={holding.id}
+                  className="min-w-0 hover:border-amber-500/50 hover:shadow-md transition-all flex flex-col"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 truncate text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                         {info.shortName}
                       </span>
-                      <h3 className="font-bold text-base text-foreground truncate mt-1.5">
-                        {holding.productName}
-                      </h3>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                        <Clock className="w-3.5 h-3.5" />
-                        Beli: {formatDate(holding.purchaseDate)}
-                      </p>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <div className="text-sm font-bold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg">
+                      <span className="shrink-0 whitespace-nowrap text-sm font-bold tabular-nums text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg">
                         {formatGrams(totalGrams)}
-                      </div>
-                      <span className="text-[10px] text-muted-foreground">
+                      </span>
+                    </div>
+  
+                    <h3
+                      className="font-bold text-base leading-snug text-foreground line-clamp-2 break-words"
+                      title={holding.productName}
+                    >
+                      {holding.productName}
+                    </h3>
+  
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1 whitespace-nowrap">
+                        <Clock className="w-3.5 h-3.5 shrink-0" />
+                        Beli: {formatDate(holding.purchaseDate)}
+                      </span>
+                      <span aria-hidden>•</span>
+                      <span className="whitespace-nowrap">
                         {holding.quantity} keping @ {holding.weightGrams}g
                       </span>
                     </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-3 pt-0">
-                  <div className="p-3 rounded-lg bg-background/60 border border-border/80 space-y-1.5 text-xs">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Modal Beli Total:</span>
-                      <span className="font-medium text-foreground tabular-nums">
-                        {formatIDR(holding.purchaseCost)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Estimasi Resale (Buyback):</span>
-                      <span className="font-bold text-foreground tabular-nums">
-                        {val?.totalEstimatedResaleValue
-                          ? formatIDR(val.totalEstimatedResaleValue)
-                          : formatIDR(holding.purchaseCost)}
-                      </span>
-                    </div>
-
-                    {val?.unrealizedPnL !== null && val?.unrealizedPnL !== undefined && (
-                      <div className="flex justify-between pt-1 border-t border-border/50">
-                        <span className="text-muted-foreground">Untung/Rugi:</span>
-                        <span
-                          className={`font-bold tabular-nums flex items-center gap-1 ${
-                            isProfit
-                              ? 'text-emerald-600 dark:text-emerald-400'
-                              : 'text-rose-600 dark:text-rose-400'
-                          }`}
-                        >
-                          {isProfit ? (
-                            <TrendingUp className="w-3 h-3" />
-                          ) : (
-                            <TrendingDown className="w-3 h-3" />
-                          )}
-                          {formatIDR(val.unrealizedPnL)} ({formatPercentage(val.unrealizedReturnPct)})
+                  </CardHeader>
+  
+                  <CardContent className="flex flex-1 flex-col gap-3 pt-0">
+                    <div className="p-3 rounded-lg bg-background/60 border border-border/80 space-y-1.5 text-xs">
+                      <div className={VALUE_ROW_CLASS}>
+                        <span>Modal Beli Total:</span>
+                        <span className="ml-auto font-medium text-foreground tabular-nums">
+                          {formatIDR(holding.purchaseCost)}
                         </span>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <Link href={`/holdings/${holding.id}`}>
-                      <Button variant="ghost" size="sm" className="gap-1 text-xs">
-                        <Eye className="w-3.5 h-3.5" /> Detail
-                      </Button>
-                    </Link>
-
-                    <div className="flex items-center gap-1">
-                      <Link href={`/holdings/${holding.id}/edit`}>
-                        <Button variant="ghost" size="sm" className="text-xs">
-                          <Edit className="w-3.5 h-3.5" />
+                      <div className={VALUE_ROW_CLASS}>
+                        <span>Estimasi Resale (Buyback):</span>
+                        <span className="ml-auto font-bold text-foreground tabular-nums">
+                          {val?.totalEstimatedResaleValue
+                            ? formatIDR(val.totalEstimatedResaleValue)
+                            : formatIDR(holding.purchaseCost)}
+                        </span>
+                      </div>
+  
+                      {val?.unrealizedPnL !== null && val?.unrealizedPnL !== undefined && (
+                        <div className={`${VALUE_ROW_CLASS} pt-1.5 border-t border-border/50`}>
+                          <span>Untung/Rugi:</span>
+                          <span
+                            className={`ml-auto font-bold tabular-nums flex items-center gap-1 ${
+                              isProfit
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-rose-600 dark:text-rose-400'
+                            }`}
+                          >
+                            {isProfit ? (
+                              <TrendingUp className="w-3 h-3 shrink-0" />
+                            ) : (
+                              <TrendingDown className="w-3 h-3 shrink-0" />
+                            )}
+                            {formatIDR(val.unrealizedPnL)} ({formatPercentage(val.unrealizedReturnPct)})
+                          </span>
+                        </div>
+                      )}
+                    </div>
+  
+                    {/* Actions */}
+                    <div className="mt-auto flex items-center justify-between pt-2 border-t border-border">
+                      <Link href={`/holdings/${holding.id}`}>
+                        <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                          <Eye className="w-3.5 h-3.5" /> Detail
                         </Button>
                       </Link>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeletingHolding(holding)}
-                        className="text-xs text-destructive hover:bg-destructive/10"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+  
+                      <div className="flex items-center gap-1">
+                        <Link href={`/holdings/${holding.id}/edit`}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs"
+                            aria-label={`Ubah ${holding.productName}`}
+                            title="Ubah"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </Button>
+                        </Link>
+  
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeletingHolding(holding)}
+                          className="text-xs text-destructive hover:bg-destructive/10"
+                          aria-label={`Hapus ${holding.productName}`}
+                          title="Hapus"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
       )}
 

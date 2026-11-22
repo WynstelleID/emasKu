@@ -5,12 +5,11 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useHoldings } from '@/features/holdings/hooks/use-holdings';
 import { goldHoldingSchema } from '@/lib/validation/schemas';
 import type { GoldHolding, HoldingCategory } from '@/types/gold';
 import { KNOWN_PROVIDERS } from '@/lib/pricing/providers';
-import { ArrowLeft, Save, Sparkles } from 'lucide-react';
+import { ArrowLeft, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 interface HoldingFormProps {
@@ -137,42 +136,49 @@ export function HoldingForm({ initialData, isEdit = false }: HoldingFormProps) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-2">
-        <Link href={isEdit && initialData ? `/holdings/${initialData.id}` : '/holdings'}>
-          <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Kembali
-          </Button>
+    <div className="mx-auto max-w-3xl space-y-8 pb-4">
+      <header className="space-y-5">
+        <Link
+          href={isEdit && initialData ? `/holdings/${initialData.id}` : '/holdings'}
+          className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {isEdit ? 'Kembali ke detail emas' : 'Kembali ke koleksi'}
         </Link>
-      </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            {isEdit ? 'Edit catatan emas' : 'Tambah emas'}
+          </h1>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Catat detail emas dan pembelian Anda dalam satu tempat.
+          </p>
+        </div>
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            {isEdit ? 'Edit Catatan Emas' : 'Tambah Koleksi Emas Fisik'}
-          </CardTitle>
-          <CardDescription>
-            Masukkan informasi kepemilikan emas untuk menghitung estimasi nilai aset dan keuntungan.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="space-y-8 p-5 sm:p-8">
             {errors.form && (
-              <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+              <div role="alert" className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
                 {errors.form}
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section aria-labelledby="gold-details-heading" className="space-y-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="gold-details-heading" className="text-base font-semibold">Detail emas</h2>
+              <p className="text-xs text-muted-foreground">* Wajib diisi</p>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {/* Provider Selection */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Penyedia / Produsen <span className="text-destructive">*</span>
+                <label htmlFor="providerId" className="text-sm font-medium text-foreground">
+                  Penyedia emas <span className="text-destructive">*</span>
                 </label>
                 <Select
+                  id="providerId"
                   name="providerId"
+                  aria-invalid={Boolean(errors.providerId)}
+                  aria-describedby={errors.providerId ? 'providerId-error' : undefined}
                   value={formData.providerId}
                   onChange={handleChange}
                 >
@@ -185,17 +191,20 @@ export function HoldingForm({ initialData, isEdit = false }: HoldingFormProps) {
                   <option value="other">Penyedia / Toko Lain</option>
                 </Select>
                 {errors.providerId && (
-                  <p className="text-xs text-destructive">{errors.providerId}</p>
+                  <p id="providerId-error" className="text-xs text-destructive">{errors.providerId}</p>
                 )}
               </div>
 
               {/* Category */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Kategori Emas <span className="text-destructive">*</span>
+                <label htmlFor="category" className="text-sm font-medium text-foreground">
+                  Kategori <span className="text-destructive">*</span>
                 </label>
                 <Select
+                  id="category"
                   name="category"
+                  aria-invalid={Boolean(errors.category)}
+                  aria-describedby={errors.category ? 'category-error' : undefined}
                   value={formData.category}
                   onChange={handleChange}
                 >
@@ -203,83 +212,100 @@ export function HoldingForm({ initialData, isEdit = false }: HoldingFormProps) {
                   <option value="jewelry">Perhiasan Emas</option>
                   <option value="other">Emas Lainnya (Koin/Dinar)</option>
                 </Select>
+                {errors.category && <p id="category-error" className="text-xs text-destructive">{errors.category}</p>}
               </div>
             </div>
 
             {/* Product Name */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">
-                Nama Produk / Keterangan <span className="text-destructive">*</span>
+              <label htmlFor="productName" className="text-sm font-medium text-foreground">
+                Nama produk <span className="text-destructive">*</span>
               </label>
               <Input
+                id="productName"
                 name="productName"
+                aria-invalid={Boolean(errors.productName)}
+                aria-describedby={errors.productName ? 'productName-error' : undefined}
                 value={formData.productName}
                 onChange={handleChange}
                 placeholder="Contoh: Emas Batangan Antam CertiCard 5g"
               />
               {errors.productName && (
-                <p className="text-xs text-destructive">{errors.productName}</p>
+                <p id="productName-error" className="text-xs text-destructive">{errors.productName}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {/* Weight */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Berat per Keping (Gram) <span className="text-destructive">*</span>
+                <label htmlFor="weightGrams" className="text-sm font-medium text-foreground">
+                  Berat per keping (gram) <span className="text-destructive">*</span>
                 </label>
                 <Input
                   type="number"
                   step="any"
+                  id="weightGrams"
                   name="weightGrams"
+                  aria-invalid={Boolean(errors.weightGrams)}
+                  aria-describedby={errors.weightGrams ? 'weightGrams-error' : undefined}
                   value={formData.weightGrams}
                   onChange={handleChange}
                   placeholder="1.0"
                 />
                 {errors.weightGrams && (
-                  <p className="text-xs text-destructive">{errors.weightGrams}</p>
+                  <p id="weightGrams-error" className="text-xs text-destructive">{errors.weightGrams}</p>
                 )}
               </div>
 
               {/* Quantity */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Jumlah (Keping/Unit) <span className="text-destructive">*</span>
+                <label htmlFor="quantity" className="text-sm font-medium text-foreground">
+                  Jumlah keping <span className="text-destructive">*</span>
                 </label>
                 <Input
                   type="number"
+                  id="quantity"
                   name="quantity"
+                  aria-invalid={Boolean(errors.quantity)}
+                  aria-describedby={errors.quantity ? 'quantity-error' : undefined}
                   value={formData.quantity}
                   onChange={handleChange}
                   min="1"
                 />
                 {errors.quantity && (
-                  <p className="text-xs text-destructive">{errors.quantity}</p>
+                  <p id="quantity-error" className="text-xs text-destructive">{errors.quantity}</p>
                 )}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          </section>
+
+          <section aria-labelledby="purchase-details-heading" className="space-y-5 border-t border-border pt-7">
+            <h2 id="purchase-details-heading" className="text-base font-semibold">Pembelian</h2>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {/* Purchase Date */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Tanggal Beli <span className="text-destructive">*</span>
+                <label htmlFor="purchaseDate" className="text-sm font-medium text-foreground">
+                  Tanggal beli <span className="text-destructive">*</span>
                 </label>
                 <Input
                   type="date"
+                  id="purchaseDate"
                   name="purchaseDate"
+                  aria-invalid={Boolean(errors.purchaseDate)}
+                  aria-describedby={errors.purchaseDate ? 'purchaseDate-error' : undefined}
                   value={formData.purchaseDate}
                   onChange={handleChange}
                 />
                 {errors.purchaseDate && (
-                  <p className="text-xs text-destructive">{errors.purchaseDate}</p>
+                  <p id="purchaseDate-error" className="text-xs text-destructive">{errors.purchaseDate}</p>
                 )}
               </div>
 
               {/* Purchase Cost */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">
-                  Total Modal Pembelian (Rp) <span className="text-destructive">*</span>
+                <label htmlFor="purchaseCost" className="text-sm font-medium text-foreground">
+                  Total harga beli <span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-semibold text-muted-foreground select-none pointer-events-none">
@@ -288,46 +314,56 @@ export function HoldingForm({ initialData, isEdit = false }: HoldingFormProps) {
                   <Input
                     type="text"
                     inputMode="numeric"
+                    id="purchaseCost"
                     name="purchaseCost"
+                    aria-invalid={Boolean(errors.purchaseCost)}
+                    aria-describedby={errors.purchaseCost ? 'purchaseCost-error' : 'purchaseCost-hint'}
                     value={formatCurrencyInput(formData.purchaseCost)}
                     onChange={handleCurrencyChange}
                     placeholder="0"
                     className="pl-9 font-medium tabular-nums"
                   />
                 </div>
+                <p id="purchaseCost-hint" className="text-xs leading-relaxed text-muted-foreground">Total untuk seluruh keping, bukan harga per gram.</p>
                 {errors.purchaseCost && (
-                  <p className="text-xs text-destructive">{errors.purchaseCost}</p>
+                  <p id="purchaseCost-error" className="text-xs text-destructive">{errors.purchaseCost}</p>
                 )}
               </div>
             </div>
 
+          </section>
+
             {/* Jewelry Specific Attributes (purity & making charges) */}
             {formData.category === 'jewelry' && (
-              <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                  Detail Perhiasan
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <section aria-labelledby="jewelry-details-heading" className="space-y-5 border-t border-border pt-7">
+                <h2 id="jewelry-details-heading" className="text-base font-semibold">
+                  Detail perhiasan <span className="ml-1 text-xs font-normal text-muted-foreground">Opsional</span>
+                </h2>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground">
-                      Kadar / Kemurnian (Karat / Fineness)
+                    <label htmlFor="purity" className="text-sm font-medium text-foreground">
+                      Kadar / kemurnian
                     </label>
                     <Input
                       type="number"
                       step="any"
+                      id="purity"
                       name="purity"
+                      aria-invalid={Boolean(errors.purity)}
+                      aria-describedby={errors.purity ? 'purity-error' : 'purity-hint'}
                       value={formData.purity}
                       onChange={handleChange}
                       placeholder="24, 22, 18, atau 750"
                     />
-                    <span className="text-[11px] text-muted-foreground">
-                      Standar: 24k (99.9%), 22k (91.6%), 18k / 750 (75%)
-                    </span>
+                    <p id="purity-hint" className="text-xs leading-relaxed text-muted-foreground">
+                      Contoh: 24k, 22k, 18k, atau 750.
+                    </p>
+                    {errors.purity && <p id="purity-error" className="text-xs text-destructive">{errors.purity}</p>}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground">
-                      Ongkos Pembuatan (Rp)
+                    <label htmlFor="makingCharges" className="text-sm font-medium text-foreground">
+                      Ongkos pembuatan
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-2.5 text-xs font-semibold text-muted-foreground select-none pointer-events-none">
@@ -336,54 +372,64 @@ export function HoldingForm({ initialData, isEdit = false }: HoldingFormProps) {
                       <Input
                         type="text"
                         inputMode="numeric"
-                        name="makingCharges"
+                        id="makingCharges"
+                      name="makingCharges"
+                      aria-invalid={Boolean(errors.makingCharges)}
+                      aria-describedby={errors.makingCharges ? 'makingCharges-error' : 'makingCharges-hint'}
                         value={formatCurrencyInput(formData.makingCharges)}
                         onChange={handleCurrencyChange}
                         placeholder="0"
                         className="pl-9 font-medium tabular-nums"
                       />
                     </div>
-                    <span className="text-[11px] text-muted-foreground">
-                      Biasanya tidak masuk dalam nilai buyback saat dijual kembali
-                    </span>
+                    <p id="makingCharges-hint" className="text-xs leading-relaxed text-muted-foreground">
+                      Biasanya tidak termasuk dalam nilai buyback.
+                    </p>
+                    {errors.makingCharges && <p id="makingCharges-error" className="text-xs text-destructive">{errors.makingCharges}</p>}
                   </div>
                 </div>
-              </div>
+              </section>
             )}
 
-            {/* Notes */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">
-                Catatan (Nomor Seri / Toko Pembelian)
-              </label>
+          <details className="group border-t border-border pt-6" open={Boolean(initialData?.notes) || Boolean(errors.notes) || undefined}>
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+              <span>Catatan tambahan <span className="ml-1 text-xs font-normal text-muted-foreground">Opsional</span></span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden="true" />
+            </summary>
+            <div className="mt-4 space-y-2">
+              <label htmlFor="notes" className="text-sm font-medium text-foreground">Catatan</label>
               <textarea
+                id="notes"
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
                 rows={3}
-                className="w-full rounded-lg border border-input bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                placeholder="Catatan tambahan seperti nomor seri sertifikat atau nota toko..."
+                maxLength={500}
+                aria-invalid={Boolean(errors.notes)}
+                aria-describedby={errors.notes ? 'notes-error' : 'notes-hint'}
+                className="w-full resize-y rounded-lg border border-input bg-background p-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="Nomor seri, toko pembelian, atau informasi lainnya"
               />
+              {errors.notes ? <p id="notes-error" className="text-xs text-destructive">{errors.notes}</p> : (
+                <p id="notes-hint" className="text-xs text-muted-foreground">Maksimal 500 karakter.</p>
+              )}
             </div>
+          </details>
+        </div>
 
-            <div className="pt-4 flex items-center justify-end gap-3">
-              <Link href="/holdings">
-                <Button type="button" variant="outline">
-                  Batal
-                </Button>
-              </Link>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-amber-600 hover:bg-amber-700 text-white gap-2 font-semibold"
-              >
-                <Save className="w-4 h-4" />
-                {isSubmitting ? 'Menyimpan...' : isEdit ? 'Simpan Perubahan' : 'Tambahkan ke Portofolio'}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+        <footer className="flex flex-col-reverse gap-3 border-t border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <Link
+            href={isEdit && initialData ? `/holdings/${initialData.id}` : '/holdings'}
+            className="inline-flex h-11 items-center justify-center rounded-lg px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Batal
+          </Link>
+          <Button type="submit" disabled={isSubmitting} className="h-11 px-6 shadow-none">
+            {isSubmitting ? 'Menyimpan...' : isEdit ? 'Simpan perubahan' : 'Simpan emas'}
+          </Button>
+        </footer>
+      </form>
+      <p className="text-center text-xs text-muted-foreground">Data tersimpan di perangkat Anda.</p>
     </div>
   );
 }
